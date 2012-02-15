@@ -44,24 +44,25 @@ This is a port of the example libev program.
   (ev_init ev cb)
   (ev_timer_set ev after repeat))
 
-(with-foreign-objects ((stdin-watcher 'ev_io)
-                       (timeout-watcher 'ev_timer))
-  (defun main ()
-    (with-foreign-object (l :pointer)
-      (setf l (ev_default_loop 0))
 
-      (ev_io_init stdin-watcher 
-                  'stdin-cb
-                  0
-                  EV_READ)
-      (ev_io_start l stdin-watcher)
+(defparameter *stdin-watcher* (foreign-alloc 'ev_io))
+(defparameter *timeout-watcher* (foreign-alloc 'ev_timer))
 
-      (ev_timer_init timeout-watcher
-                     'timeout-cb
-                     5.5d0
-                     0.0d0)
+(defun main ()
+  (let ((loop (ev_default_loop 
+               (logior (ev_recommended_backends) EVBACKEND_KQUEUE))))
 
-      (ev_timer_start l timeout-watcher)
+    (ev_io_init *stdin-watcher*
+                'stdin-cb
+                0
+                EV_READ)
+    (ev_io_start loop *stdin-watcher*)
 
-      (ev_run l 0))))
+    (ev_timer_init *timeout-watcher*
+                   'timeout-cb
+                   5.5d0
+                   0.0d0)
+    (ev_timer_start loop *timeout-watcher*)
+
+    (ev_run loop 0)))
 ```
