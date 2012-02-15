@@ -44,7 +44,6 @@ This is a port of the example libev program.
   (ev_init ev cb)
   (ev_timer_set ev after repeat))
 
-
 (with-foreign-objects ((stdin-watcher 'ev_io)
                        (timeout-watcher 'ev_timer))
   (defun main ()
