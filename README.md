@@ -49,8 +49,7 @@ This is a port of the example libev program.
 (defparameter *timeout-watcher* (foreign-alloc 'ev_timer))
 
 (defun main ()
-  (let ((loop (ev_default_loop 
-               (logior (ev_recommended_backends) EVBACKEND_KQUEUE))))
+  (let ((loop (ev_default_loop 0)))
 
     (ev_io_init *stdin-watcher*
                 'stdin-cb
@@ -62,6 +61,7 @@ This is a port of the example libev program.
                    'timeout-cb
                    5.5d0
                    0.0d0)
+
     (ev_timer_start loop *timeout-watcher*)
 
     (ev_run loop 0)))
