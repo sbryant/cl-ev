@@ -7,4 +7,4 @@
   :depends-on (#:cffi)
   :components ((:module "src" :components
                         ((:file "package")
-                         (:file "ev" :depends-on ("package"))))))
+                         (:file "cffi" :depends-on ("package"))))))
