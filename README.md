@@ -2,7 +2,8 @@ cl-ev
 -----
 cl-ev is an attempt at  cffi bindings for libev. 
 
-## Example Usage 
+Example Usage 
+-------------
 This is a port of the example libev program. 
 
 ```common-lisp
