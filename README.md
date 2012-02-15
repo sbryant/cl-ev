@@ -48,8 +48,6 @@ This is a port of the example libev program.
                        (timeout-watcher 'ev_timer))
   (defun main ()
     (with-foreign-object (l :pointer)
-      (declaim (optimize (safety 3)))
-
       (setf l (ev_default_loop 0))
 
       (ev_io_init stdin-watcher 
