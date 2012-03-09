@@ -33,11 +33,12 @@
                         (unless (eq 1 (ev_is_default_loop ptr)) ;; we don't own the ev default loop
                           (ev_loop_destroy ptr))))))
 
-(defmethod initialize-instance :after ((self ev-io-watcher) &key)
-  (setf (gethash (pointer-address (watcher self)) *watchers*) self))
-
-(defmethod initialize-instance :after ((self ev-timer) &key)
-  (setf (gethash (pointer-address (watcher self)) *watchers*) self))
+(defmethod initialize-instance :after ((self ev-watcher) &key)
+  (let ((ptr (watcher self)))
+    (tg:finalize self (lambda () 
+                        (stop-watcher self)
+                        (cffi:foreign-free ptr)))
+    (setf (gethash (pointer-address ptr) *watchers*) self)))
 
 (defun callback-key (watcher) 
   (pointer-address (watcher watcher)))
