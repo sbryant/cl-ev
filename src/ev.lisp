@@ -74,10 +74,10 @@
   (ev_io_init (watcher watcher) 'ev_callback fd event-type)
   (ev_io_start (event-loop loop) (watcher watcher)))
 
-(defmethod set-timer ((loop ev-loop) (watcher ev-timer) function timeout &key repeat)
+(defmethod set-timer ((loop ev-loop) (watcher ev-timer) function timeout &key (repeat 0.0d0))
   (setf (gethash (callback-key watcher) *callbacks*)
         function)
-  (ev_timer_init (watcher watcher) 'ev_callback timeout (if repeat 1.0d0 0.0d0))
+  (ev_timer_init (watcher watcher) 'ev_callback timeout repeat)
   (ev_timer_start (event-loop loop) (watcher watcher)))
 
 (defcallback ev_callback :void ((ev-loop :pointer) (watcher :pointer) (events :int))
