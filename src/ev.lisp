@@ -80,17 +80,6 @@
   (ev_timer_init (watcher watcher) 'ev_callback timeout repeat)
   (ev_timer_start (event-loop loop) (watcher watcher)))
 
-(defcallback ev_callback :void ((ev-loop :pointer) (watcher :pointer) (events :int))
-  (let ((l (gethash (pointer-address ev-loop) *loops*))
-        (w (gethash (pointer-address watcher) *watchers*)))
-    (ev-callback l w events)))
-
-(defmethod ev-callback ((loop ev-loop) (watcher ev-watcher) events)
-  (format t "Callback dispatch hit~%")
-  (funcall (gethash (callback-key watcher) *callbacks*) loop watcher events))
-
-(defmethod event-dispatch ((loop ev-loop))
-  (ev_run (event-loop loop) 0))
 (defmethod set-perodic ((loop ev-loop) (watcher ev-periodic) cb offset interval reschedule-cb)
   (setf (gethash (callback-key watcher) *callbacks*)
         cb)
@@ -106,3 +95,14 @@
   (let ((w (gethash (pointer-address watcher) *watchers*)))
     (funcall (gethash (callback-key w) *reschedule-callbacks*) w now)))
 
+(defcallback ev_callback :void ((ev-loop :pointer) (watcher :pointer) (events :int))
+  (let ((l (gethash (pointer-address ev-loop) *loops*))
+        (w (gethash (pointer-address watcher) *watchers*)))
+    (ev-callback l w events)))
+
+(defmethod ev-callback ((loop ev-loop) (watcher ev-watcher) events)
+  (format t "Callback dispatch hit~%")
+  (funcall (gethash (callback-key watcher) *callbacks*) loop watcher events))
+
+(defmethod event-dispatch ((loop ev-loop))
+  (ev_run (event-loop loop) 0))
