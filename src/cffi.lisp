@@ -681,3 +681,21 @@
 (defun ev_timer_init (ev cb after repeat)
   (ev_init ev cb)
   (ev_timer_set ev after repeat))
+
+(defun ev_periodic_init (ev cb offset interval resched-cb)
+  (ev_init ev cb)
+  (ev_periodic_set ev offset interval resched-cb))
+
+(defun ev_periodic_set (ev _offset _interval resched-cb)
+  (with-foreign-slots ((offset interval reschedule_cb) ev ev_periodic)
+    (setf offset _offset
+          interval _interval
+          reschedule_cb resched-cb)))
+
+(defun ev_is_active (ev)
+ (with-foreign-slots ((active) ev ev_watcher)
+  (+ 0 active)))
+
+(defun ev_is_pending (ev)
+ (with-foreign-slots ((pending) ev ev_watcher)
+  (+ 0 pending)))

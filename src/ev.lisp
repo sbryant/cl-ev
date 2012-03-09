@@ -3,6 +3,7 @@
 (defparameter *loops* (make-hash-table))
 (defparameter *watchers* (make-hash-table))
 (defparameter *callbacks* (make-hash-table))
+(defparameter *reschedule-callbacks* (make-hash-table))
 
 (defclass ev-loop () 
   ((event-loop :accessor event-loop
@@ -21,7 +22,9 @@
   ((timer :accessor watcher
           :initform (foreign-alloc 'ev_timer))))
 
-(defmethod initialize-instance :after ((self ev-watcher) &key))
+(defclass ev-periodic (ev-watcher)
+  ((timer :accessor watcher
+          :initform (foreign-alloc 'ev_periodic))))
 
 (defmethod initialize-instance :after ((self ev-loop) &key)
   (let ((ptr (event-loop self)))
@@ -67,3 +70,18 @@
 
 (defmethod event-dispatch ((loop ev-loop))
   (ev_run (event-loop loop) 0))
+(defmethod set-perodic ((loop ev-loop) (watcher ev-periodic) cb offset interval reschedule-cb)
+  (setf (gethash (callback-key watcher) *callbacks*)
+        cb)
+  (when reschedule-cb
+    (setf (gethash (callback-key watcher) *reschedule-callbacks*)
+          reschedule-cb))
+  (ev_periodic_init (watcher watcher) 'ev_callback offset interval (if reschedule-cb
+                                                                       'ev_reschedule_callback
+                                                                       (cffi:null-pointer)))
+  (ev_periodic_start (event-loop loop) (watcher watcher)))
+
+(defcallback ev_reschedule_callback ev_tstamp ((watcher :pointer) (now ev_tstamp))
+  (let ((w (gethash (pointer-address watcher) *watchers*)))
+    (funcall (gethash (callback-key w) *reschedule-callbacks*) w now)))
+
