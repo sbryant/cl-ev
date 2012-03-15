@@ -71,14 +71,12 @@
 (defmethod set-io-watcher ((loop ev-loop) (watcher ev-io-watcher) fd event-type function)
   (setf (gethash (callback-key watcher) *callbacks*)
         function)
-  (ev_io_init (watcher watcher) 'ev_callback fd event-type)
-  (ev_io_start (event-loop loop) (watcher watcher)))
+  (ev_io_init (watcher watcher) 'ev_callback fd event-type))
 
 (defmethod set-timer ((loop ev-loop) (watcher ev-timer) function timeout &key (repeat 0.0d0))
   (setf (gethash (callback-key watcher) *callbacks*)
         function)
-  (ev_timer_init (watcher watcher) 'ev_callback timeout repeat)
-  (ev_timer_start (event-loop loop) (watcher watcher)))
+  (ev_timer_init (watcher watcher) 'ev_callback timeout repeat))
 
 (defmethod set-perodic ((loop ev-loop) (watcher ev-periodic) cb offset interval reschedule-cb)
   (setf (gethash (callback-key watcher) *callbacks*)
@@ -88,8 +86,7 @@
           reschedule-cb))
   (ev_periodic_init (watcher watcher) 'ev_callback offset interval (if reschedule-cb
                                                                        'ev_reschedule_callback
-                                                                       (cffi:null-pointer)))
-  (ev_periodic_start (event-loop loop) (watcher watcher)))
+                                                                       (cffi:null-pointer))))
 
 (defcallback ev_reschedule_callback ev_tstamp ((watcher :pointer) (now ev_tstamp))
   (let ((w (gethash (pointer-address watcher) *watchers*)))
@@ -106,3 +103,16 @@
 
 (defmethod event-dispatch ((loop ev-loop))
   (ev_run (event-loop loop) 0))
+
+(defmethod event-dispatch :before ((loop ev-loop))
+  (maphash (lambda (k v) 
+             (start-watcher loop v)) *watchers*))
+
+(defmethod start-watcher ((loop ev-loop) (watcher ev-io-watcher))
+  (ev_io_start (event-loop loop) (watcher watcher)))
+
+(defmethod start-watcher ((loop ev-loop) (watcher ev-timer))
+  (ev_timer_start (event-loop loop) (watcher watcher)))
+
+(defmethod start-watcher ((loop ev-loop) (watcher ev-periodic))
+  (ev_periodic_start (event-loop loop) (watcher watcher)))
