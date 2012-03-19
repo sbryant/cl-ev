@@ -10,6 +10,11 @@
            :stop-watcher
 
            :ev-timer
-           :set-timer))
+           :set-timer
+
+           :ev-io-watcher
+           :set-io-watcher
+
+           :EV_READ))
 
 (in-package :ev)
