@@ -47,6 +47,7 @@
 (defgeneric set-io-watcher (ev-loop watcher fd event-type function))
 (defgeneric set-timer (ev-loop watcher function timeout &key repeat))
 (defgeneric stop-watcher (loop watcher))
+(defgeneric start-watcher (loop watcher))
 (defgeneric event-dispatch (ev-loop))
 
 (defmethod stop-watcher :before ((loop ev-loop) watcher)
