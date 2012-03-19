@@ -34,14 +34,14 @@
                           (ev_loop_destroy ptr))))))
 
 (defmethod initialize-instance :after ((self ev-watcher) &key)
-  (let ((ptr (watcher self)))
+  (let ((ptr (ev-pointer self)))
     (tg:finalize self (lambda () 
                         (stop-watcher self)
                         (cffi:foreign-free ptr)))
     (setf (gethash (pointer-address ptr) *watchers*) self)))
 
-(defun callback-key (watcher) 
-  (pointer-address (watcher watcher)))
+(defun callback-key (watcher)
+  (pointer-address (ev-pointer watcher)))
 
 (defgeneric ev-callback (ev-loop watcher events))
 (defgeneric set-io-watcher (ev-loop watcher fd event-type function))
@@ -50,33 +50,33 @@
 (defgeneric event-dispatch (ev-loop))
 
 (defmethod stop-watcher :before ((loop ev-loop) watcher)
-  (when (= 1 (ev_is_pending (watcher watcher)))
+  (when (= 1 (ev_is_pending (ev-pointer watcher)))
     (ev_invoke_pending (event-loop loop))))
 
 (defmethod stop-watcher ((loop ev-loop) (watcher ev-io-watcher))
-  (when (= 1 (ev_is_active (watcher watcher)))
-    (ev_io_stop (event-loop loop) (watcher watcher)))
+  (when (= 1 (ev_is_active (ev-pointer watcher)))
+    (ev_io_stop (event-loop loop) (ev-pointer watcher)))
   (remhash (callback-key watcher) *watchers*))
 
 (defmethod stop-watcher ((loop ev-loop) (watcher ev-timer))
-  (when (= 1 (ev_is_active (watcher watcher)))
-    (ev_timer_stop (event-loop loop) (watcher watcher)))
+  (when (= 1 (ev_is_active (ev-pointer watcher)))
+    (ev_timer_stop (event-loop loop) (ev-pointer watcher)))
   (remhash (callback-key watcher) *watchers*))
 
 (defmethod stop-watcher ((loop ev-loop) (watcher ev-periodic))
-  (when (= 1 (ev_is_active (watcher watcher)))
-    (ev_periodic_stop (event-loop loop) (watcher watcher)))
+  (when (= 1 (ev_is_active (ev-pointer watcher)))
+    (ev_periodic_stop (event-loop loop) (ev-pointer watcher)))
   (remhash (callback-key watcher) *watchers*))
 
 (defmethod set-io-watcher ((loop ev-loop) (watcher ev-io-watcher) fd event-type function)
   (setf (gethash (callback-key watcher) *callbacks*)
         function)
-  (ev_io_init (watcher watcher) 'ev_callback fd event-type))
+  (ev_io_init (ev-pointer watcher) 'ev_callback fd event-type))
 
 (defmethod set-timer ((loop ev-loop) (watcher ev-timer) function timeout &key (repeat 0.0d0))
   (setf (gethash (callback-key watcher) *callbacks*)
         function)
-  (ev_timer_init (watcher watcher) 'ev_callback timeout repeat))
+  (ev_timer_init (ev-pointer watcher) 'ev_callback timeout repeat))
 
 (defmethod set-perodic ((loop ev-loop) (watcher ev-periodic) cb offset interval reschedule-cb)
   (setf (gethash (callback-key watcher) *callbacks*)
@@ -84,7 +84,7 @@
   (when reschedule-cb
     (setf (gethash (callback-key watcher) *reschedule-callbacks*)
           reschedule-cb))
-  (ev_periodic_init (watcher watcher) 'ev_callback offset interval (if reschedule-cb
+  (ev_periodic_init (ev-pointer watcher) 'ev_callback offset interval (if reschedule-cb
                                                                        'ev_reschedule_callback
                                                                        (cffi:null-pointer))))
 
@@ -109,10 +109,10 @@
              (start-watcher loop v)) *watchers*))
 
 (defmethod start-watcher ((loop ev-loop) (watcher ev-io-watcher))
-  (ev_io_start (event-loop loop) (watcher watcher)))
+  (ev_io_start (event-loop loop) (ev-pointer watcher)))
 
 (defmethod start-watcher ((loop ev-loop) (watcher ev-timer))
-  (ev_timer_start (event-loop loop) (watcher watcher)))
+  (ev_timer_start (event-loop loop) (ev-pointer watcher)))
 
 (defmethod start-watcher ((loop ev-loop) (watcher ev-periodic))
-  (ev_periodic_start (event-loop loop) (watcher watcher)))
+  (ev_periodic_start (event-loop loop) (ev-pointer watcher)))
