@@ -51,21 +51,21 @@
 (defgeneric event-dispatch (ev-loop &optional initial-start))
 
 (defmethod stop-watcher :before ((loop ev-loop) watcher)
-  (when (= 1 (ev_is_pending (ev-pointer watcher)))
+  (unless (zerop (ev_is_pending (ev-pointer watcher)))
     (ev_invoke_pending (event-loop loop))))
 
 (defmethod stop-watcher ((loop ev-loop) (watcher ev-io-watcher))
-  (when (= 1 (ev_is_active (ev-pointer watcher)))
+  (unless (zerop (ev_is_active (ev-pointer watcher)))
     (ev_io_stop (event-loop loop) (ev-pointer watcher)))
   (remhash (callback-key watcher) *watchers*))
 
 (defmethod stop-watcher ((loop ev-loop) (watcher ev-timer))
-  (when (= 1 (ev_is_active (ev-pointer watcher)))
+  (unless (zerop (ev_is_active (ev-pointer watcher)))
     (ev_timer_stop (event-loop loop) (ev-pointer watcher)))
   (remhash (callback-key watcher) *watchers*))
 
 (defmethod stop-watcher ((loop ev-loop) (watcher ev-periodic))
-  (when (= 1 (ev_is_active (ev-pointer watcher)))
+  (unless (zerop (ev_is_active (ev-pointer watcher)))
     (ev_periodic_stop (event-loop loop) (ev-pointer watcher)))
   (remhash (callback-key watcher) *watchers*))
 
