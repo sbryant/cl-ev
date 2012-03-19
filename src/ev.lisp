@@ -99,7 +99,6 @@
     (ev-callback l w events)))
 
 (defmethod ev-callback ((loop ev-loop) (watcher ev-watcher) events)
-  (format t "Callback dispatch hit~%")
   (funcall (gethash (callback-key watcher) *callbacks*) loop watcher events))
 
 (defmethod event-dispatch ((loop ev-loop) &optional initial-start)
