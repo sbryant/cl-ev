@@ -15,6 +15,7 @@
            :ev-io-watcher
            :set-io-watcher
 
-           :EV_READ))
+           :EV_READ
+           :EV_WRITE))
 
 (in-package :ev)
