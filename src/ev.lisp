@@ -5,7 +5,7 @@
 (defparameter *callbacks* (make-hash-table))
 (defparameter *reschedule-callbacks* (make-hash-table))
 
-(defclass ev-loop () 
+(defclass ev-loop ()
   ((event-loop :accessor event-loop
                :initarg :ev-loop
                :documentation "the libev event_loop"))
@@ -29,14 +29,14 @@
 (defmethod initialize-instance :after ((self ev-loop) &key)
   (let ((ptr (event-loop self)))
     (setf (gethash (pointer-address ptr) *loops*) self)
-    (tg:finalize self (lambda () 
+    (tg:finalize self (lambda ()
                         (if (eq 1 (ev_is_default_loop ptr)) ;; we don't own the ev default loop
                             (ev_loop_destroy (ev_default_loop 0))
                             (ev_loop_destroy ptr))))))
 
 (defmethod initialize-instance :after ((self ev-watcher) &key)
   (let ((ptr (ev-pointer self)))
-    (tg:finalize self (lambda () 
+    (tg:finalize self (lambda ()
                         (cffi:foreign-free ptr)))
     (setf (gethash (pointer-address ptr) *watchers*) self)))
 
@@ -48,7 +48,7 @@
 (defgeneric set-timer (ev-loop watcher function timeout &key repeat))
 (defgeneric stop-watcher (loop watcher))
 (defgeneric start-watcher (loop watcher))
-(defgeneric event-dispatch (ev-loop))
+(defgeneric event-dispatch (ev-loop &optional initial-start))
 
 (defmethod stop-watcher :before ((loop ev-loop) watcher)
   (when (= 1 (ev_is_pending (ev-pointer watcher)))
@@ -102,12 +102,14 @@
   (format t "Callback dispatch hit~%")
   (funcall (gethash (callback-key watcher) *callbacks*) loop watcher events))
 
-(defmethod event-dispatch ((loop ev-loop))
+(defmethod event-dispatch ((loop ev-loop) &optional initial-start)
+  (declare (ignore initial-start))
   (ev_run (event-loop loop) 0))
 
-(defmethod event-dispatch :before ((loop ev-loop))
-  (maphash (lambda (k v) 
-             (start-watcher loop v)) *watchers*))
+(defmethod event-dispatch :before ((loop ev-loop) &optional (initial-start t))
+  (when initial-start
+    (maphash (lambda (k v)
+               (start-watcher loop v)) *watchers*)))
 
 (defmethod start-watcher ((loop ev-loop) (watcher ev-io-watcher))
   (ev_io_start (event-loop loop) (ev-pointer watcher)))

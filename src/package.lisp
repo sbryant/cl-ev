@@ -5,6 +5,7 @@
            :ev_now
            :event-dispatch
 
+           :start-watcher
            :stop-watcher
 
            :ev-timer
