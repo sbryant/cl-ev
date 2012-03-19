@@ -37,7 +37,6 @@
 (defmethod initialize-instance :after ((self ev-watcher) &key)
   (let ((ptr (ev-pointer self)))
     (tg:finalize self (lambda () 
-                        (stop-watcher self)
                         (cffi:foreign-free ptr)))
     (setf (gethash (pointer-address ptr) *watchers*) self)))
 
