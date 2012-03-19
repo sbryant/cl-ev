@@ -46,28 +46,31 @@
 (defgeneric ev-callback (ev-loop watcher events))
 (defgeneric set-io-watcher (ev-loop watcher fd event-type function))
 (defgeneric set-timer (ev-loop watcher function timeout &key repeat))
-(defgeneric stop-watcher (loop watcher))
+(defgeneric stop-watcher (loop watcher &key keep-callback))
 (defgeneric start-watcher (loop watcher))
 (defgeneric event-dispatch (ev-loop &optional initial-start))
 
-(defmethod stop-watcher :before ((loop ev-loop) watcher)
+(defmethod stop-watcher :before ((loop ev-loop) watcher &key keep-callback)
   (unless (zerop (ev_is_pending (ev-pointer watcher)))
     (ev_invoke_pending (event-loop loop))))
 
-(defmethod stop-watcher ((loop ev-loop) (watcher ev-io-watcher))
+(defmethod stop-watcher ((loop ev-loop) (watcher ev-io-watcher) &key keep-callback)
   (unless (zerop (ev_is_active (ev-pointer watcher)))
     (ev_io_stop (event-loop loop) (ev-pointer watcher)))
-  (remhash (callback-key watcher) *watchers*))
+  (unless keep-callback
+    (remhash (callback-key watcher) *watchers*)))
 
-(defmethod stop-watcher ((loop ev-loop) (watcher ev-timer))
+(defmethod stop-watcher ((loop ev-loop) (watcher ev-timer) &key keep-callback)
   (unless (zerop (ev_is_active (ev-pointer watcher)))
     (ev_timer_stop (event-loop loop) (ev-pointer watcher)))
-  (remhash (callback-key watcher) *watchers*))
+  (unless keep-callback
+    (remhash (callback-key watcher) *watchers*)))
 
-(defmethod stop-watcher ((loop ev-loop) (watcher ev-periodic))
+(defmethod stop-watcher ((loop ev-loop) (watcher ev-periodic) &key keep-callback)
   (unless (zerop (ev_is_active (ev-pointer watcher)))
     (ev_periodic_stop (event-loop loop) (ev-pointer watcher)))
-  (remhash (callback-key watcher) *watchers*))
+  (unless keep-callback
+    (remhash (callback-key watcher) *watchers*)))
 
 (defmethod set-io-watcher ((loop ev-loop) (watcher ev-io-watcher) fd event-type function)
   (setf (gethash (callback-key watcher) *callbacks*)
