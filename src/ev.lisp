@@ -15,16 +15,16 @@
   ())
 
 (defclass ev-io-watcher (ev-watcher)
-  ((watcher :accessor watcher
-            :initform (foreign-alloc 'ev_io))))
+  ((watcher-pointer :accessor ev-pointer
+                    :initform (foreign-alloc 'ev_io))))
 
 (defclass ev-timer (ev-watcher)
-  ((timer :accessor watcher
-          :initform (foreign-alloc 'ev_timer))))
+  ((timer-pointer :accessor ev-pointer
+                  :initform (foreign-alloc 'ev_timer))))
 
 (defclass ev-periodic (ev-watcher)
-  ((timer :accessor watcher
-          :initform (foreign-alloc 'ev_periodic))))
+  ((periodic-pointer :accessor ev-pointer
+                     :initform (foreign-alloc 'ev_periodic))))
 
 (defmethod initialize-instance :after ((self ev-loop) &key)
   (let ((ptr (event-loop self)))
