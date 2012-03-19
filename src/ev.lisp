@@ -1,9 +1,9 @@
 (in-package :ev)
 
-(defparameter *loops* (make-hash-table))
-(defparameter *watchers* (make-hash-table))
-(defparameter *callbacks* (make-hash-table))
-(defparameter *reschedule-callbacks* (make-hash-table))
+(defvar *loops* (make-hash-table))
+(defvar *watchers* (make-hash-table))
+(defvar *callbacks* (make-hash-table))
+(defvar *reschedule-callbacks* (make-hash-table))
 
 (defclass ev-loop ()
   ((event-loop :accessor event-loop
