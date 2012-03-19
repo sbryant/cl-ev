@@ -30,8 +30,9 @@
   (let ((ptr (event-loop self)))
     (setf (gethash (pointer-address ptr) *loops*) self)
     (tg:finalize self (lambda () 
-                        (unless (eq 1 (ev_is_default_loop ptr)) ;; we don't own the ev default loop
-                          (ev_loop_destroy ptr))))))
+                        (if (eq 1 (ev_is_default_loop ptr)) ;; we don't own the ev default loop
+                            (ev_loop_destroy (ev_default_loop 0))
+                            (ev_loop_destroy ptr))))))
 
 (defmethod initialize-instance :after ((self ev-watcher) &key)
   (let ((ptr (ev-pointer self)))
