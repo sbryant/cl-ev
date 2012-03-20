@@ -48,7 +48,7 @@
 (defgeneric set-timer (ev-loop watcher function timeout &key repeat))
 (defgeneric stop-watcher (loop watcher &key keep-callback))
 (defgeneric start-watcher (loop watcher))
-(defgeneric event-dispatch (ev-loop &optional initial-start))
+(defgeneric event-dispatch (ev-loop &optional start-watchers))
 
 (defmethod stop-watcher :before ((loop ev-loop) watcher &key keep-callback)
   (unless (zerop (ev_is_pending (ev-pointer watcher)))
@@ -104,12 +104,12 @@
 (defmethod ev-callback ((loop ev-loop) (watcher ev-watcher) events)
   (funcall (gethash (callback-key watcher) *callbacks*) loop watcher events))
 
-(defmethod event-dispatch ((loop ev-loop) &optional initial-start)
-  (declare (ignore initial-start))
+(defmethod event-dispatch ((loop ev-loop) &optional start-watchers)
+  (declare (ignore start-watchers))
   (ev_run (event-loop loop) 0))
 
-(defmethod event-dispatch :before ((loop ev-loop) &optional (initial-start t))
-  (when initial-start
+(defmethod event-dispatch :before ((loop ev-loop) &optional (start-watchers t))
+  (when start-watchers
     (maphash (lambda (k v)
                (start-watcher loop v)) *watchers*)))
 
