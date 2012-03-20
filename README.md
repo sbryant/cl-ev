@@ -19,38 +19,11 @@ This is a port of the example libev program.
   (format t "timeout ~%")
   (ev_break loop EVBREAK_ALL))
 
-(defun ev_init (ev cb_)
-  (with-foreign-slots ((active pending priority cb) ev ev_io)
-    (setf active 0 
-          pending 0 
-          priority 0 
-          cb (get-callback cb_))))
-
-(defun ev_io_set (ev fd_ events_)
-  (with-foreign-slots ((fd events) ev ev_io)
-    (setf fd fd_ 
-          events events_)))
-
-(defun ev_timer_set (ev after_ repeat_)
-  (with-foreign-slots ((at repeat) ev ev_timer)
-    (setf at after_
-          repeat repeat_)))
-
-(defun ev_io_init (ev cb fd events) 
-  (ev_init ev cb)
-  (ev_io_set ev fd events))
-
-(defun ev_timer_init (ev cb after repeat)
-  (ev_init ev cb)
-  (ev_timer_set ev after repeat))
-
-
 (defparameter *stdin-watcher* (foreign-alloc 'ev_io))
 (defparameter *timeout-watcher* (foreign-alloc 'ev_timer))
 
 (defun main ()
   (let ((loop (ev_default_loop 0)))
-
     (ev_io_init *stdin-watcher*
                 'stdin-cb
                 0
@@ -61,7 +34,6 @@ This is a port of the example libev program.
                    'timeout-cb
                    5.5d0
                    0.0d0)
-
     (ev_timer_start loop *timeout-watcher*)
 
     (ev_run loop 0)))

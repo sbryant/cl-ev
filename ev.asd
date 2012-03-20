@@ -4,7 +4,8 @@
 (in-package :ev-system)
 
 (defsystem #:ev
-  :depends-on (#:cffi)
+  :depends-on (#:cffi #:trivial-garbage)
   :components ((:module "src" :components
                         ((:file "package")
-                         (:file "ev" :depends-on ("package"))))))
+                         (:file "cffi" :depends-on ("package"))
+                         (:file "ev" :depends-on ("cffi"))))))
