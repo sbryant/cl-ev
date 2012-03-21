@@ -10,31 +10,23 @@ This is a port of the example libev program.
 (ql:quickload :ev)
 (in-package :ev)
 
-(defcallback stdin-cb :void ((loop :pointer) (w :pointer) (revents :int))
-  (format t "stdin ready~%")
-  (ev_io_stop loop w)
-  (ev_break loop EVBREAK_ALL))
+(defparameter *io-handler* (make-instance 'ev-io-watcher))
+(defparameter *timer-handler* (make-instance 'ev-timer))
+(defparameter *periodic-handler* (make-instance 'ev-periodic))
 
-(defcallback timeout-cb :void ((loop :pointer) (w :pointer) (revents :int))
-  (format t "timeout ~%")
-  (ev_break loop EVBREAK_ALL))
+(defun io-cb (loop watcher events) 
+  (format t "IO Callback hit! loop ~S watcher ~S events ~S~%" loop watcher events))
 
-(defparameter *stdin-watcher* (foreign-alloc 'ev_io))
-(defparameter *timeout-watcher* (foreign-alloc 'ev_timer))
+(defun timer-cb (loop watcher events) 
+  (format t "Timer Callback hit! loop ~S watcher ~S events ~S~%" loop watcher events))
 
-(defun main ()
-  (let ((loop (ev_default_loop 0)))
-    (ev_io_init *stdin-watcher*
-                'stdin-cb
-                0
-                EV_READ)
-    (ev_io_start loop *stdin-watcher*)
+(defun periodic-cb (loop watcher events) 
+  (format t "Periodic Callback hit! loop ~S watcher ~S events ~S~%" loop watcher events))
 
-    (ev_timer_init *timeout-watcher*
-                   'timeout-cb
-                   5.5d0
-                   0.0d0)
-    (ev_timer_start loop *timeout-watcher*)
-
-    (ev_run loop 0)))
+(defun run-loop ()
+  (let ((l (make-instance 'ev-loop)))
+    (set-timer l *timer-handler* #'timer-cb 5.5d0)
+    (set-io-watcher l *io-handler* 0 EV_READ #'io-cb)
+    (set-perodic l *periodic-handler* #'periodic-cb 0.0d0 10.0d0 nil)
+    (event-dispatch l)))
 ```
