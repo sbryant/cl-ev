@@ -2,6 +2,24 @@ cl-ev
 -----
 cl-ev is an attempt at  cffi bindings for libev. 
 
+API Support
+-----------
+We support the following watchers: 
+
+* Periodic
+* IO
+* Timer
+
+TODO
+----
+Support the following watchers:
+
+* Signal 
+* Child
+* Stat
+* Idle 
+* Fork 
+
 Example Usage 
 -------------
 This is a port of the example libev program. 
