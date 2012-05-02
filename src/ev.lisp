@@ -46,9 +46,13 @@
 (defgeneric ev-callback (ev-loop watcher events))
 (defgeneric set-io-watcher (ev-loop watcher fd event-type function))
 (defgeneric set-timer (ev-loop watcher function timeout &key repeat))
+(defgeneric watcher-active-p (watcher))
 (defgeneric stop-watcher (loop watcher &key keep-callback))
 (defgeneric start-watcher (loop watcher))
 (defgeneric event-dispatch (ev-loop &optional start-watchers))
+
+(defmethod watcher-active-p ((watcher ev-watcher))
+  (not (zerop (ev_is_active (ev-pointer watcher)))))
 
 (defmethod stop-watcher :before ((loop ev-loop) watcher &key keep-callback)
   (unless (zerop (ev_is_pending (ev-pointer watcher)))
