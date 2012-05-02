@@ -6,8 +6,12 @@
            :event-dispatch
 
            :ev-watcher
+           :watcher-active-p
            :start-watcher
            :stop-watcher
+
+           :ev-idle
+           :set-idle
 
            :ev-timer
            :set-timer
