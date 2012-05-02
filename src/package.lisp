@@ -10,6 +10,9 @@
            :start-watcher
            :stop-watcher
 
+           :ev-idle
+           :set-idle
+
            :ev-timer
            :set-timer
 
