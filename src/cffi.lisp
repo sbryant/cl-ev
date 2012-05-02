@@ -4,7 +4,7 @@
 ;;; Do not make changes to this file unless you know what you are doing--modify
 ;;; the SWIG interface file instead.
 (in-package :ev)
-(define-foreign-library libev 
+(define-foreign-library libev
   (:unix (:or "libev.4.dylib" "libev.4.so" "libev.dylib" "libev.so"))
   (t (:default "libev")))
 
@@ -36,7 +36,7 @@
                       ((cl:lower-case-p c)
                        (helper (cl:cdr lst) 'lower (cl:cons (cl:char-upcase c) rest)))
                       ((cl:digit-char-p c)
-                       (helper (cl:cdr lst) 'digit 
+                       (helper (cl:cdr lst) 'digit
                                (cl:case last
                                  ((upper lower) (cl:list* c #\- rest))
                                  (cl:t (cl:cons c rest)))))
@@ -115,7 +115,7 @@
 
 (cl:defconstant EV_VERSION_MINOR 4)
 
-(defanonenum 
+(defanonenum
 	(EV_UNDEF #.#xFFFFFFFF)
 	(EV_NONE #.#x00)
 	(EV_READ #.#x01)
@@ -336,7 +336,7 @@
 	(embed ev_embed)
 	(async ev_async))
 
-(defanonenum 
+(defanonenum
 	(EVFLAG_AUTO #.#x00000000)
 	(EVFLAG_NOENV #.#x01000000)
 	(EVFLAG_FORKCHECK #.#x02000000)
@@ -345,7 +345,7 @@
 	(EVFLAG_SIGNALFD #.#x00200000)
 	(EVFLAG_NOSIGMASK #.#x00400000))
 
-(defanonenum 
+(defanonenum
 	(EVBACKEND_SELECT #.#x00000001)
 	(EVBACKEND_POLL #.#x00000002)
 	(EVBACKEND_EPOLL #.#x00000004)
@@ -402,11 +402,11 @@
 (cffi:defcfun ("ev_now_update" ev_now_update) :void
   (loop :pointer))
 
-(defanonenum 
+(defanonenum
 	(EVRUN_NOWAIT #.1)
 	(EVRUN_ONCE #.2))
 
-(defanonenum 
+(defanonenum
 	(EVBREAK_CANCEL #.0)
 	(EVBREAK_ONE #.1)
 	(EVBREAK_ALL #.2))
@@ -656,17 +656,17 @@
 
 (cffi:defcfun ("ev_loop_verify" ev_loop_verify) :void
   (loop :pointer))
- 
+
 (defun ev_init (ev cb_)
   (with-foreign-slots ((active pending priority cb) ev ev_io)
-    (setf active 0 
-          pending 0 
-          priority 0 
+    (setf active 0
+          pending 0
+          priority 0
           cb (get-callback cb_))))
 
 (defun ev_io_set (ev fd_ events_)
   (with-foreign-slots ((fd events) ev ev_io)
-    (setf fd fd_ 
+    (setf fd fd_
           events events_)))
 
 (defun ev_timer_set (ev after_ repeat_)
@@ -674,7 +674,10 @@
     (setf at after_
           repeat repeat_)))
 
-(defun ev_io_init (ev cb fd events) 
+(defun ev_idle_init (ev cb)
+  (ev_init ev cb))
+
+(defun ev_io_init (ev cb fd events)
   (ev_init ev cb)
   (ev_io_set ev fd events))
 

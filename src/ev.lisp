@@ -26,6 +26,10 @@
   ((periodic-pointer :accessor ev-pointer
                      :initform (foreign-alloc 'ev_periodic))))
 
+(defclass ev-idle (ev-watcher)
+  ((idle-watcher :accessor ev-pointer
+                 :initform (foreign-alloc 'ev_idle))))
+
 (defmethod initialize-instance :after ((self ev-loop) &key)
   (let ((ptr (event-loop self)))
     (setf (gethash (pointer-address ptr) *loops*) self)
@@ -44,15 +48,26 @@
   (pointer-address (ev-pointer watcher)))
 
 (defgeneric ev-callback (ev-loop watcher events))
+(defgeneric set-idle (ev-loop watcher function))
 (defgeneric set-io-watcher (ev-loop watcher fd event-type function))
 (defgeneric set-timer (ev-loop watcher function timeout &key repeat))
+(defgeneric watcher-active-p (watcher))
 (defgeneric stop-watcher (loop watcher &key keep-callback))
 (defgeneric start-watcher (loop watcher))
 (defgeneric event-dispatch (ev-loop &optional start-watchers))
 
+(defmethod watcher-active-p ((watcher ev-watcher))
+  (not (zerop (ev_is_active (ev-pointer watcher)))))
+
 (defmethod stop-watcher :before ((loop ev-loop) watcher &key keep-callback)
   (unless (zerop (ev_is_pending (ev-pointer watcher)))
     (ev_invoke_pending (event-loop loop))))
+
+(defmethod stop-watcher ((loop ev-loop) (watcher ev-idle) &key keep-callback)
+  (unless (zerop (ev_is_active (ev-pointer watcher)))
+    (ev_idle_stop (event-loop loop) (ev-pointer watcher)))
+  (unless keep-callback
+    (remhash (callback-key watcher) *watchers*)))
 
 (defmethod stop-watcher ((loop ev-loop) (watcher ev-io-watcher) &key keep-callback)
   (unless (zerop (ev_is_active (ev-pointer watcher)))
@@ -71,6 +86,11 @@
     (ev_periodic_stop (event-loop loop) (ev-pointer watcher)))
   (unless keep-callback
     (remhash (callback-key watcher) *watchers*)))
+
+(defmethod set-idle ((loop ev-loop) (watcher ev-idle) function)
+  (setf (gethash (callback-key watcher) *callbacks*)
+        function)
+  (ev_idle_init (ev-pointer watcher) 'ev_callback))
 
 (defmethod set-io-watcher ((loop ev-loop) (watcher ev-io-watcher) fd event-type function)
   (setf (gethash (callback-key watcher) *callbacks*)
@@ -112,6 +132,9 @@
   (when start-watchers
     (maphash (lambda (k v)
                (start-watcher loop v)) *watchers*)))
+
+(defmethod start-watcher ((loop ev-loop) (watcher ev-idle))
+  (ev_idle_start (event-loop loop) (ev-pointer watcher)))
 
 (defmethod start-watcher ((loop ev-loop) (watcher ev-io-watcher))
   (ev_io_start (event-loop loop) (ev-pointer watcher)))
