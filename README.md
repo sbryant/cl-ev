@@ -1,28 +1,28 @@
 cl-ev
 -----
-cl-ev is an attempt at  cffi bindings for libev. 
+cl-ev is an attempt at  cffi bindings for libev.
 
 API Support
 -----------
-We support the following watchers: 
+We support the following watchers:
 
 * Periodic
 * IO
 * Timer
+* Idle
 
 TODO
 ----
 Support the following watchers:
 
-* Signal 
+* Signal
 * Child
 * Stat
-* Idle 
-* Fork 
+* Fork
 
-Example Usage 
+Example Usage
 -------------
-This is a port of the example libev program. 
+This is a port of the example libev program.
 
 ```common-lisp
 (ql:quickload :ev)
@@ -32,13 +32,13 @@ This is a port of the example libev program.
 (defparameter *timer-handler* (make-instance 'ev-timer))
 (defparameter *periodic-handler* (make-instance 'ev-periodic))
 
-(defun io-cb (loop watcher events) 
+(defun io-cb (loop watcher events)
   (format t "IO Callback hit! loop ~S watcher ~S events ~S~%" loop watcher events))
 
-(defun timer-cb (loop watcher events) 
+(defun timer-cb (loop watcher events)
   (format t "Timer Callback hit! loop ~S watcher ~S events ~S~%" loop watcher events))
 
-(defun periodic-cb (loop watcher events) 
+(defun periodic-cb (loop watcher events)
   (format t "Periodic Callback hit! loop ~S watcher ~S events ~S~%" loop watcher events))
 
 (defun run-loop ()
