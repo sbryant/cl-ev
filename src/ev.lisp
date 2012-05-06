@@ -59,17 +59,32 @@
 (defgeneric set-watcher-slot (watcher slot value))
 (defsetf watcher-slot set-watcher-slot)
 
+;; Helpers for *-watcher-slot accessor
+(defun watcher-type-slot (watcher type slot)
+  (foreign-slot-value (ev-pointer watcher)
+                      type (find-symbol (symbol-name slot) *package*)))
+(defun set-watcher-type-slot (watcher type slot value)
+  (setf (foreign-slot-value (ev-pointer watcher)
+                            type (find-symbol (symbol-name slot) *package*))
+        value))
+
 (defmethod watcher-slot ((watcher ev-timer) slot)
   "Get the value of the slot named by a symbol in this package
 sharing a name with the symbol `slot' from an `ev-timer' wrapper."
-  (foreign-slot-value (ev-pointer watcher)
-                      'ev_timer (find-symbol (symbol-name slot) (find-package :ev))))
+  (watcher-type-slot watcher 'ev_timer slot))
 
 (defmethod set-watcher-slot ((watcher ev-timer) slot value)
   "Set the value otherwise fetched with `watcher-slot' for an `ev-timer'"
-  (setf (foreign-slot-value (ev-pointer watcher)
-                            'ev_timer (find-symbol (symbol-name slot) (find-package :ev)))
-        value))
+  (set-watcher-type-slot watcher 'ev_timer slot value))
+
+(defmethod watcher-slot ((watcher ev-idle) slot)
+  "Get the value of the slot named by a symbol in this package
+sharing a name with the symbol `slot' from an `ev-idle' wrapper."
+  (watcher-type-slot watcher 'ev_idle slot))
+
+(defmethod set-watcher-slot ((watcher ev-idle) slot value)
+  "Set the value otherwise fetched with `watcher-slot' for an `ev-idle'"
+  (set-watcher-type-slot watcher 'ev_idle slot value))
 
 (defmethod watcher-active-p ((watcher ev-watcher))
   (not (zerop (ev_is_active (ev-pointer watcher)))))
