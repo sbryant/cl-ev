@@ -62,10 +62,10 @@
 ;; Helpers for *-watcher-slot accessor
 (defun watcher-type-slot (watcher type slot)
   (foreign-slot-value (ev-pointer watcher)
-                      type (find-symbol (symbol-name slot) *package*)))
+                      type (find-symbol (symbol-name slot) (find-package :ev))))
 (defun set-watcher-type-slot (watcher type slot value)
   (setf (foreign-slot-value (ev-pointer watcher)
-                            type (find-symbol (symbol-name slot) *package*))
+                            type (find-symbol (symbol-name slot) (find-package :ev)))
         value))
 
 (defmethod watcher-slot ((watcher ev-timer) slot)
