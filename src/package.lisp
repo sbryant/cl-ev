@@ -6,6 +6,7 @@
            :event-dispatch
 
            :ev-watcher
+           :watcher-slot
            :watcher-active-p
            :start-watcher
            :stop-watcher
