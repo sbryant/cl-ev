@@ -512,10 +512,6 @@
   (loop :pointer)
   (w :pointer))
 
-(cffi:defcfun ("ev_io_stop" ev_io_stop) :void
-  (loop :pointer)
-  (w :pointer))
-
 (cffi:defcfun ("ev_timer_start" ev_timer_start) :void
   (loop :pointer)
   (w :pointer))
