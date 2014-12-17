@@ -698,3 +698,10 @@
 (defun ev_is_pending (ev)
  (with-foreign-slots ((pending) ev ev_watcher)
   (+ 0 pending)))
+
+(defun ev_signal_set (ev signum)
+  (setf (cffi:foreign-slot-value ev 'ev_signal 'signum) signum))
+
+(defun ev_signal_init (ev cb signum)
+  (ev_init ev cb)
+  (ev_signal_set ev signum))
